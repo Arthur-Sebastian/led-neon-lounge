@@ -1,4 +1,4 @@
-![Banner image](img/banner.jpg)
+![Banner image](img/banner.png)
 # LED Lounge Neon!
 An RGB LED neon project using 3d printed parts and custom AVR-based controller board with included software.
 
@@ -18,6 +18,6 @@ can be directly uploaded to a matching MCU by using the 'upload.sh' script - it 
 Can be found inside ['/resource_3d'](/resource_3d). Those are all Blender files. 
 All necessary STL exports are already made and contained within stl_* folders. 
 Slice using your favourite tool, and print! 
-(All models are optimised to fit a PRUSA Mini or bigger - min. work area of 175 x 175 x 15mm).
+(All models are optimised to fit a PRUSA Mini or bigger - min. work area of 175 x 175 x 175mm).
 
 
