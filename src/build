@@ -1,0 +1,6 @@
+#!/bin/bash
+echo -e "\nCompiling code...\n"
+avr-gcc -mmcu=atmega168 -Wall -Os -mrelax -o ./bin/out.bin *.cpp
+avr-objcopy -j .text -j .data -O ihex ./bin/out.bin ./bin/program.hex
+avr-size ./bin/program.hex
+echo -e "\nFinished!\n"
