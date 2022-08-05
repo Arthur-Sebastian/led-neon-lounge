@@ -1,2 +1,2 @@
 #!/bin/bash
-avrdude -P /dev/ttyUSB0 -p m168p -b 19200 -c arduino -U flash:w:./bin/program.hex:i
+avrdude -P /dev/ttyUSB0 -p m328p -b 19200 -c arduino -U flash:w:./bin/program.hex:i
