@@ -160,6 +160,21 @@ const uint8_t sine_half[100] PROGMEM =
 	0x0C, 0x0A, 0x07, 0x06, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00
 };
 
+const uint8_t static_color_r[10] PROGMEM =
+{
+	0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x80, 0xFF
+};
+
+const uint8_t static_color_g[10] PROGMEM =
+{
+	0x00, 0x32, 0x7D, 0xFF, 0xFF, 0xFF, 0x7D, 0x00, 0x00, 0x00
+};
+
+const uint8_t static_color_b[10] PROGMEM =
+{
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xFF, 0xFF, 0xFF, 0x80
+};
+
 /*
 Animation or color scheme functions. First argument
 determines the progression, second - the color channel.
@@ -627,4 +642,11 @@ void pong_magma(uint16_t v, const uint8_t c, color24* output)
 			output -> b = 0xC0;
 			break;
 	}
+}
+
+void static_color(uint8_t index, color24* output)
+{
+	output -> r = pgm_read_byte(&static_color_r[index]);
+	output -> g = pgm_read_byte(&static_color_g[index]);
+	output -> b = pgm_read_byte(&static_color_b[index]);
 }

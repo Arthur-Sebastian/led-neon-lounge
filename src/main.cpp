@@ -10,6 +10,9 @@
 //dimming to 50%
 #define DEV_DIMM
 
+#define FLAG_MODIFIER 0x80
+#define FLAG_INDEX 0x0F
+
 //software pwm function
 static void softpwm();
 //color calculator
@@ -36,6 +39,7 @@ color24 p6; //STUMP
 uint8_t PWR_ON = 0xFF;
 void (*mode_exe)(uint16_t, uint8_t, color24*);
 uint16_t animlen = 0;
+uint8_t FLAGS = 0x00;
 
 void setup()
 {
@@ -141,13 +145,36 @@ void coloriser(bool reset)
 		return;
 	}	
 	animtimer >= animlen ? animtimer = 0 : animtimer++;
+
 	//apply colors to the outputs
+	if(FLAGS & FLAG_MODIFIER) {
+		color24 temp;
+		static_color(FLAGS & FLAG_INDEX, &temp);
+
+		p1 = temp;
+		p2 = temp;
+		p3 = temp;
+		p4 = temp;
+		p5 = temp;
+		p6 = temp;
+
+		return;
+	}
+
 	mode_exe(animtimer, channel6, &p6);
 	mode_exe(animtimer, channel5, &p5);
 	mode_exe(animtimer, channel4, &p4);
 	mode_exe(animtimer, channel3, &p3);
 	mode_exe(animtimer, channel2, &p2);
 	mode_exe(animtimer, channel1, &p1);
+}
+
+void set_color_index(uint8_t index, uint8_t *flags)
+{
+	uint8_t temp = *flags;
+	temp &=~ FLAG_INDEX;
+	temp |= index;
+	*flags = temp;
 }
 
 void receiver()
@@ -164,71 +191,118 @@ void receiver()
 	if(recvd.addr != DEV_ADDR) return;
 	//check if power is even on
 	if(!PWR_ON && recvd.command != POWR_B) return;
+	uint8_t modifier = FLAGS & FLAG_MODIFIER;
 	//interpret which action to take
 	switch(recvd.command)
 	{
 		case POWR_B:
 			//power switch
-			if(!recvd.repeat) powermanager();
+			if(recvd.repeat) break;
+			powermanager();
+			break;
+		case MENU_B:
+			if(recvd.repeat) break;
+			FLAGS ^= FLAG_MODIFIER;
 			break;
 		case NUM0_B:
 			//static neon scheme
-			animlen = 0;
-			mode_exe = &neon_scheme;
+			if(modifier) {
+				set_color_index(0, &FLAGS);
+			} else {
+				mode_exe = &neon_scheme;
+			}
 			break;
 		case LTRC_B:
 			//blinking neon parts
-			animlen = 380;
-			mode_exe = &neon_blink;
+			if(!modifier) {
+				animlen = 380;
+				mode_exe = &neon_blink;
+			}
 			break;
 		case NUM1_B:
 			//hsv rainbow monolithic
-			animlen = 399;
-			mode_exe = &hsv_sweep;
+			if(modifier) {
+				set_color_index(1, &FLAGS);
+			} else {
+				animlen = 399;
+				mode_exe = &hsv_sweep;
+			}
 			break;
 		case NUM2_B:
 			//hsv rainbow river
-			animlen = 399;
-			mode_exe = &hsv_river;
+			if(modifier) {
+				set_color_index(2, &FLAGS);
+			} else {
+				animlen = 399;
+				mode_exe = &hsv_river;
+			}
 			break;
 		case NUM3_B:
 			//hsv rainbow volcano
-			animlen = 399;
-			mode_exe = &hsv_volcano;
+			if(modifier) {
+				set_color_index(3, &FLAGS);
+			} else {
+				animlen = 399;
+				mode_exe = &hsv_volcano;
+			}
 			break;
 		case NUM4_B:
 			//pink-cyan
-			animlen = 220;
-			mode_exe = &miami_sheen;
+			if(modifier) {
+				set_color_index(4, &FLAGS);
+			} else {
+				animlen = 220;
+				mode_exe = &miami_sheen;
+			}
 			break;
 		case NUM5_B:
 			//purple-green
-			animlen = 220;
-			mode_exe = &toxic_sheen;
+			if(modifier) {
+				set_color_index(5, &FLAGS);
+			} else {
+				animlen = 220;
+				mode_exe = &toxic_sheen;
+			}
 			break;
 		case NUM6_B:
 			//yellow-cyan
-			animlen = 220;
-			mode_exe = &cyber_sheen;
+			if(modifier) {
+				set_color_index(6, &FLAGS);
+			} else {
+				animlen = 220;
+				mode_exe = &cyber_sheen;
+			}
 			break;
 		case NUM7_B:
 			//pong multicolor
-			animlen = 560;
-			mode_exe = &pong_multicolor;
+			if(modifier) {
+				set_color_index(7, &FLAGS);
+			} else {
+				animlen = 560;
+				mode_exe = &pong_multicolor;
+			}
 			break;
 		case NUM8_B:
 			//pong magma
-			animlen = 140;
-			mode_exe = &pong_magma;
+			if(modifier) {
+				set_color_index(8, &FLAGS);
+			} else {
+				animlen = 140;
+				mode_exe = &pong_magma;
+			}
 			break;
 		case NUM9_B:
 			//pong white
-			animlen = 140;
-			mode_exe = &pong_white;
+			if(modifier) {
+				set_color_index(9, &FLAGS);
+			} else {
+				animlen = 140;
+				mode_exe = &pong_white;
+			}
 			break;
 		default:
 			return;
 	}
 	//reset animation cycle
-	coloriser(true);
+	if(recvd.command != MENU_B) coloriser(true);
 }

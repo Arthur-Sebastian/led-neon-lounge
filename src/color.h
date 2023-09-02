@@ -34,4 +34,6 @@ void cyber_sheen(uint16_t, const uint8_t, color24*);
 void pong_multicolor(uint16_t, const uint8_t, color24*);
 void pong_white(uint16_t, const uint8_t, color24*);
 void pong_magma(uint16_t, const uint8_t, color24*);
+
+void static_color(uint8_t, color24*);
 #endif
